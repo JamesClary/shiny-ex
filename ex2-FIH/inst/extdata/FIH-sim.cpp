@@ -31,7 +31,7 @@ double Vcapp = Vcapp_pop* pow((DOSEKG/10), 0.623) * pow((WTKG/3.105), 1) * exp(E
 double Qapp = Qapp_pop * pow((WTKG/3.105), 0.75) * exp(EQ);
 double Vpapp = Vpapp_pop * pow((WTKG/3.105), 1) * exp(EVp);
 
-D_GUT = Tlag;
+ALAG_GUT = Tlag;
 
 double ke = CLapp/Vcapp;
 double k12 = Qapp/Vcapp;

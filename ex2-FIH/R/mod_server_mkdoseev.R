@@ -35,7 +35,6 @@ mod_server_mkdoseev  <- function(id){
           temp <- data.frame(ID = j+(i-1)*1000,
                              time = dosetimes,
                              amt = df2[i,1],
-                             rate = -2,
                              ii2 = df2[i, 3],
                              evid = 1,
                              cmt = 1,
