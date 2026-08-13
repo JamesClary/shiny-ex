@@ -43,7 +43,7 @@ mod_server_mkplot  <- function(id, simdat_raw){
         plot <- ggplot(out_sum %>% filter(Cc > 0))+
           geom_line(aes(time, Cc, color = factor(Group), group = Group))+
           labs(x = 'Time Since First Dose (h)',
-               y = 'Conventration (ng/mL)',
+               y = 'Concentration (ng/mL)',
                color = 'Dosing Regimen')+
           theme_bw()
 
