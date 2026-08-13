@@ -11,7 +11,10 @@ mod_server_mkdoseev  <- function(id){
 
     dosing_dataframe <- eventReactive(input$btn, {
 
+      minwtkg <- input$WTKGmin
+      maxwtkg <- input$WTKGmax
 
+      wtkg <- rtruncnorm(input$nsim, a = minwtkg, b = maxwtkg, mean = 70, sd = 5)
 
       dosing <- data.frame(matrix(nrow = 0, ncol = 11))
 
@@ -26,7 +29,7 @@ mod_server_mkdoseev  <- function(id){
                              amt = 1,
                              evid = 1,
                              cmt = 1,
-                             WTKG = input$WTKG)
+                             WTKG = rep(wtkg[i], length(dosetimes)))
 
           dosing <- rbind(dosing, temp)
 

@@ -8,8 +8,16 @@ library(PKNCA)
 library(knitr)
 library(kableExtra)
 library(ggplot2)
+library(bslib)
+library(truncnorm)
+# library(survival)
+# library(survminer)
 
 run_app <- function() {
+
+  set.seed(12345)
+
+  light <- bs_theme(version = 5)
 
   shinyApp(
 
@@ -17,7 +25,8 @@ run_app <- function() {
     ui = tagList(
       fluidPage(
         navbarPage(
-          title = 'FIH Simulator',
+          title = 'Adaptive Dosing Simulations',
+          theme = light,
           h5('For Internal discussion ONLY'),
           h5('Based on Leeds, et al. Antimicrob Agents Chemother. 2013 Mar;57(3):1136–1143')
         ),

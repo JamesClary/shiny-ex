@@ -11,9 +11,19 @@ mod_ui_outputs <- function(id){
   ns <- NS(id)
 
   tagList(
-    plotOutput(outputId = ns('simPlot')),
-    plotOutput(outputId = ns('simPlotE')),
-    plotOutput(outputId = ns('simPlotDose'))
+    layout_columns(
+      card(
+        card_header(HTML('<b>Simulated PK Profile')),
+        card_body(plotOutput(outputId = ns('simPlot')))
+      ),
+      card(
+        card_header(HTML('<b>Simulated PD Profile')),
+        card_body(plotOutput(outputId = ns('simPlotE')))
+        )
+    ),
+    card(
+      card_header(HTML('<b>Simulated Dose vs Time Plot')),
+      card_body(plotOutput(outputId = ns('simPlotDose'))))
   )
 
 }

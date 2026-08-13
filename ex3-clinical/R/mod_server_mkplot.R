@@ -81,6 +81,8 @@ mod_server_mkplot  <- function(id, simdat_raw){
       if(input$nsim == 1){
 
         plot <- ggplot(out_sum %>% filter(Cc > 0) |> mutate(Group = ''))+
+          geom_hline(yintercept = 60, linetype = 'dashed')+
+          geom_hline(yintercept = 30, linetype = 'dashed')+
           geom_line(aes(time, E, color = factor(Group), group = Group))+
           labs(x = 'Time Since First Dose (h)',
                y = 'Change From Baseline (%)')+
@@ -99,6 +101,8 @@ mod_server_mkplot  <- function(id, simdat_raw){
           mutate(Group = '')
 
         plot <- ggplot(out_sum %>% filter(pmid > 0))+
+          geom_hline(yintercept = 60, linetype = 'dashed')+
+          geom_hline(yintercept = 30, linetype = 'dashed')+
           geom_ribbon(aes(time, ymin = plow, ymax = phi, fill = factor(Group)), color = NA, alpha = 0.2)+
           geom_line(aes(time, pmid, color = factor(Group), group = Group))+
           labs(x = 'Time Since First Dose (h)',

@@ -128,7 +128,7 @@ if(SOLVERTIME > 0 && fmod(SOLVERTIME, 24.)<=0 && dtime !=0){
   double pincr = exp(lgpincr+hieff*hieff_fl)/(1+exp(lgpincr+hieff*hieff_fl));
 
   double loeff_fl = 0;
-  if(E < 20) loeff_fl = 1;
+  if(E < 30) loeff_fl = 1;
   double loeff =3.2;
   double pdecr = exp(lgpdecr+loeff*loeff_fl)/(1+exp(lgpdecr+loeff*loeff_fl));
 

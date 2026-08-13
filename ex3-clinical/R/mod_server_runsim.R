@@ -10,9 +10,14 @@ mod_server_runsim  <- function(id, dosedat){
 
   moduleServer(id, function(input, output, session){
 
-    mod <- eventReactive(input$btn, {
+    mod <- eventReactive(input$dosevec, {
 
       mods <- mread(system.file('extdata', 'adaptive-dose-mod.cpp', package = 'ex3-clinical'))
+
+      dose_vec_num <- as.numeric(unlist(strsplit(input$dosevec, ',')))
+
+      mods <- env_update(mods, DOSEQD = dose_vec_num)
+      mods <- env_eval(mods)
 
       return(mods)
 
@@ -21,6 +26,8 @@ mod_server_runsim  <- function(id, dosedat){
     sim_dataframe <- eventReactive(input$btn, {
 
       df <- dosedat()
+
+      set.seed(12345)
 
       if(input$nsim == 1){
 
