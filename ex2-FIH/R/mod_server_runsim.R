@@ -10,7 +10,7 @@ mod_server_runsim  <- function(id, dosedat){
 
   moduleServer(id, function(input, output, session){
 
-    mod <- eventReactive(input$btn, {
+    mod <- eventReactive(input$modtype, {
 
       if(input$modtype == 'Infected'){
         mods <- mread(system.file('extdata', 'FIH-sim2.cpp', package = 'ex2-FIH'))
