@@ -1,20 +1,19 @@
-[ PLUGIN ]
+[ PLUGIN ]  // Plugins to use R functions and grab from global environment
 Rcpp
 evtools
 mrgx
 
-[ ENV ] // R-code
-DOSEQD = c(25, 50, 75, 100, 125)
-x_int = 2
-max_valQD = length(DOSEQD)
+[ ENV ]                           // R-environment variables to pull from shiny app
+DOSEQD = c(25, 50, 75, 100, 125)  // doses
+x_int = 2                         // initial state
 
-[ GLOBAL ] //for future Markov model
+[ GLOBAL ]
 Rcpp::NumericVector DOSEQD;
 Rcpp::NumericVector x_int;
-Rcpp::NumericVector max_valQD;
-double probs[5];
-int states[5];
+double probs[5];           // initialize probability
+int states[5];             // initialize states
 
+// function to find stat_index
 int findIndex(int *array, int size, int target)
 {
   int i=0;
@@ -27,7 +26,6 @@ int findIndex(int *array, int size, int target)
 [ PREAMBLE]
 DOSEQD = mrgx::get<Rcpp::NumericVector>("DOSEQD", self);
 x_int = mrgx::get<Rcpp::NumericVector>("x_int", self);
-max_valQD = mrgx::get<Rcpp::NumericVector>("max_valQD", self);
 
 [ PARAM ] @annotated
 KA_pop    : 0.868  : KA for NHP uninfected
@@ -56,27 +54,27 @@ PERI : Peripheral compartment
 
 if(NEWIND<=1){
 
-  double prob0 = 0.96;
-  double prob1 = 0.01;
-  double prob2 = 0.01;
-  double prob3 = 0.01;
-  double prob4 = 1-(0.96+0.01+0.01+0.01);
+  double prob0 = 0.96; // probability at state 1, cpp starts indexing at 0
+  double prob1 = 0.01; // probability at state 2
+  double prob2 = 0.01; // probability at state 3
+  double prob3 = 0.01; // probability at state 4
+  double prob4 = 1-(0.96+0.01+0.01+0.01);  // probability at state 4 should all add to 5
 
-
+  // fill probability index
   probs[0] = prob0;
   probs[1] = prob1;
   probs[2] = prob2;
   probs[3] = prob3;
   probs[4] = prob4;
-
+  // start at state 1
   double dose_ind = 0;
-
+  // initialize dose and capture dose
   int DOSE = DOSEQD[0];
   double state_dose = 0;
   double pstate_dose = 0;
-
+  // covariate calculation
   double DOSEKG = DOSE/WTKG;
-
+  // protection for state change on non-dose records
   double dosetime = 0;
   double dtime = 0;
 }
@@ -104,9 +102,9 @@ double Cc = CENT/Vcapp*1000;
 double E = 100 * (1 - Cc/(200+Cc));
 
 dtime = SOLVERTIME - dosetime;
-
+// check only at dosing times whether to change dose
 if(SOLVERTIME > 0 && fmod(SOLVERTIME, 24.)<=0 && dtime !=0){
-
+  // base probabilities of dose change
   double lgpincr = -2.2;
   double lgpdecr = -2.2;
   double lgpincr2 = -2.9;
@@ -121,58 +119,58 @@ if(SOLVERTIME > 0 && fmod(SOLVERTIME, 24.)<=0 && dtime !=0){
   double pdecr3 = exp(lgpdecr3)/(1+exp(lgpdecr3));
   double lgpdecr4 = -4.59;
   double pdecr4 = exp(lgpdecr4)/(1+exp(lgpdecr4));
-
+  // probabilities based on Therapeutic Index
   double hieff_fl = 0;
   if(E > 60) hieff_fl = 1;
   double hieff = 3.2;
   double pincr = exp(lgpincr+hieff*hieff_fl)/(1+exp(lgpincr+hieff*hieff_fl));
-
+  // probabilities based on Therapeutic Index
   double loeff_fl = 0;
   if(E < 30) loeff_fl = 1;
   double loeff =3.2;
   double pdecr = exp(lgpdecr+loeff*loeff_fl)/(1+exp(lgpdecr+loeff*loeff_fl));
 
-  if (dose_ind == 0){
+  if (dose_ind == 0){ // current state is 1
     prob1 = pincr;
     prob2 = pincr2;
     prob3 = pincr3;
     prob4 = pincr4;
     prob0 = 1-(prob1+prob2+prob3+prob4);
-  } else if (dose_ind == 1){
+  } else if (dose_ind == 1){ // current state is 2
     prob0 = pdecr;
     prob2 = pincr;
     prob3 = pincr2;
     prob4 = pincr3;
     prob1 = 1-(prob0+prob2+prob3+prob4);
-  }  else if (dose_ind == 2){
+  }  else if (dose_ind == 2){ // current state is 3
     prob0 = pdecr2;
     prob1 = pdecr;
     prob3 = pincr;
     prob4 = pincr2;
     prob2 = 1-(prob0+prob1+prob3+prob4);
-  }  else if (dose_ind == 3){
+  }  else if (dose_ind == 3){ // current state is 4
     prob0 = pdecr3;
     prob1 = pdecr2;
     prob2 = pdecr;
     prob4 = pincr;
     prob3 = 1-(prob0+prob1+prob2+prob4);
-  } else if (dose_ind == 4){
+  } else if (dose_ind == 4){ // current state is 5
     prob0 = pdecr4;
     prob1 = pdecr3;
     prob2 = pdecr2;
     prob3 =  pdecr;
     prob4 = 1-(prob0+prob1+prob2+prob3);
   }
-
+  // fill probability vector
   probs[0] = prob0;
   probs[1] = prob1;
   probs[2] = prob2;
   probs[3] = prob3;
   probs[4] = prob4;
 
-  R::rmultinom(1, probs, 5, states);
-  dose_ind = findIndex(states, 5, 1);
-  pstate_dose = state_dose;
+  R::rmultinom(1, probs, 5, states); // draw from multinominal distribution
+  dose_ind = findIndex(states, 5, 1); // find draw position
+  pstate_dose = state_dose; // update state information and dosing
   state_dose = dose_ind;
   DOSE = DOSEQD[dose_ind];
   DOSEKG = DOSE/WTKG;

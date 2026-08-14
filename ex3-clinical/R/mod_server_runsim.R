@@ -14,10 +14,10 @@ mod_server_runsim  <- function(id, dosedat){
 
       mods <- mread(system.file('extdata', 'adaptive-dose-mod.cpp', package = 'ex3-clinical'))
 
-      dose_vec_num <- as.numeric(unlist(strsplit(input$dosevec, ',')))
+      dose_vec_num <- as.numeric(unlist(strsplit(input$dosevec, ','))) # grab vector and make numeric
 
-      mods <- env_update(mods, DOSEQD = dose_vec_num)
-      mods <- env_eval(mods)
+      mods <- env_update(mods, DOSEQD = dose_vec_num) # push to mrgsolve environment
+      mods <- env_eval(mods) # update mod to run sim
 
       return(mods)
 
